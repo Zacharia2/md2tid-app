@@ -2,7 +2,14 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
+import Button from "@mui/material/Button";
+import { test } from "./test";
+test();
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
@@ -15,7 +22,6 @@ function App() {
   return (
     <main className="container">
       <h1>Welcome to Tauri + React</h1>
-
       <div className="row">
         <a href="https://vitejs.dev" target="_blank">
           <img src="/vite.svg" className="logo vite" alt="Vite logo" />
@@ -44,6 +50,7 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <Button variant="contained">Hello world</Button>
     </main>
   );
 }

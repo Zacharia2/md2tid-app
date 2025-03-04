@@ -5,6 +5,25 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default"
+    "opener:default",
+    "fs:default",
+    "fs:read-all",
+    "fs:write-all",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "**/*" }]
+    },
+    {
+      "identifier": "fs:write-files",
+      "allow": [{ "path": "**/*" }]
+    },
+    {
+      "identifier": "fs:read-files",
+      "allow": [{ "path": "**/*" }]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [{ "path": "**/*" }]
+    }
   ]
 }
