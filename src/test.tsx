@@ -1,6 +1,6 @@
 import { md2tid } from "md-to-tid";
 
-import { readFile, writeFile, readDir } from "@tauri-apps/plugin-fs";
+import { readFile, writeFile, readDir, remove } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
 
 export async function test() {
@@ -11,18 +11,14 @@ export async function test() {
     "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/360 评估.md";
   const testwfile =
     "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/tidresult.md";
-  let b = await readFile(testfile);
-  const tidText = await md2tid(new TextDecoder("utf-8").decode(b));
-  let c = new TextEncoder().encode(tidText);
   // console.log(tidText);
   let dir = "C:/Users/Snowy/Documents/GitHub/md2tid/src";
-  let d = await readDir("C:/Users/Snowy/Documents/GitHub/md2tid/src");
 
   console.log(await readDirs(dir));
 
-  console.log(d);
-
-  writeFile(testwfile, c);
+  const tidText = await md2tid(await read(testfile));
+  remove(testwfile);
+  write(testwfile, tidText);
 }
 async function readDirs(dir: string): Promise<string[]> {
   const entries = await readDir(dir);
@@ -31,6 +27,7 @@ async function readDirs(dir: string): Promise<string[]> {
     entry: entry,
   }));
   let filePaths: string[] = [];
+  // 语言表示的是相对位置，上下，左右，父子，当前和下层
   while (processingQueue.length > 0) {
     const queueItem = processingQueue.pop();
     if (!queueItem) continue;
@@ -49,4 +46,12 @@ async function readDirs(dir: string): Promise<string[]> {
     }
   }
   return filePaths;
+}
+
+async function write(path: string, data: string) {
+  await writeFile(path, new TextEncoder().encode(data));
+}
+
+async function read(path: string) {
+  return new TextDecoder("utf-8").decode(await readFile(path));
 }
