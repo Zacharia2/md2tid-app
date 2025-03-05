@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { DeleteOutline } from "@mui/icons-material";
-import { md2tid, readDirs, write, remove } from "./until";
+import { readDirs, transform_and_write } from "./until";
 
 import {
   Button,
@@ -20,7 +20,8 @@ function App() {
   // let dir = "C:/Users/Snowy/Documents/GitHub/md2tid/src";
 
   const [dirs, setDirs] = useState<string[]>([]);
-  const [pathValue, setPathValue] = useState("");
+  const [sourcePath, setSourcePath] = useState("");
+  const [targetPath, setTargetPath] = useState("");
 
   // remove(testwfile);
   function renderRow(props: ListChildComponentProps) {
@@ -52,27 +53,38 @@ function App() {
     <main className="container">
       <TextField
         id="outlined-basic"
-        label="路径"
+        label="输入"
         variant="outlined"
         size="small"
         style={{ marginBottom: 10 }}
-        value={pathValue}
+        value={sourcePath}
         onChange={(e) => {
-          setPathValue(e.target.value);
+          setSourcePath(e.target.value);
+        }}
+      />
+      <TextField
+        id="outlined-basic"
+        label="输出"
+        variant="outlined"
+        size="small"
+        style={{ marginBottom: 10 }}
+        value={targetPath}
+        onChange={(e) => {
+          setTargetPath(e.target.value);
         }}
       />
       <Button
         variant="outlined"
         style={{ marginBottom: 10 }}
         onClick={async () => {
-          let dirs = await readDirs(pathValue);
+          let dirs = await readDirs(sourcePath);
           setDirs(dirs);
         }}
       >
         读取
       </Button>
       <List
-        height={350}
+        height={300}
         width={"100%"}
         itemSize={30}
         itemCount={dirs.length}
@@ -86,8 +98,7 @@ function App() {
         onClick={() => {
           for (let index = 0; index < dirs.length; index++) {
             const element = dirs[index];
-            let tidText = md2tid(element);
-            write("C:/Users/Snowy/Documents/GitHub", tidText);
+            transform_and_write(element, targetPath);
           }
         }}
       >

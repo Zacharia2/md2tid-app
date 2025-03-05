@@ -1,5 +1,7 @@
+import { path } from "@tauri-apps/api";
 import { join } from "@tauri-apps/api/path";
 import { readDir, readFile, remove, writeFile } from "@tauri-apps/plugin-fs";
+import { md2tid } from "md-to-tid";
 
 export const testfile =
   "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/360 评估.md";
@@ -34,16 +36,20 @@ async function readDirs(dir: string): Promise<string[]> {
   return filePaths;
 }
 
-async function write(path: string, data: Promise<string>) {
-  await writeFile(path, new TextEncoder().encode(await data));
+async function write(path: string, data: string) {
+  await writeFile(path, new TextEncoder().encode(data));
 }
 
 async function read(path: string) {
   return new TextDecoder("utf-8").decode(await readFile(path));
 }
 
-async function md2tid(mdpath: string) {
-  return await read(mdpath);
+async function transform_and_write(sourcefile: string, savefile: string) {
+  savefile = await path.join(savefile, await path.basename(sourcefile));
+  // console.log(savefile);
+  let md = await read(sourcefile);
+  let tid = await md2tid(md);
+  await write(savefile, tid);
 }
 
-export { remove, readDirs, write, read, md2tid };
+export { remove, readDirs, transform_and_write };
