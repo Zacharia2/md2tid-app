@@ -23,6 +23,7 @@ function App() {
 
   const [dirs, setDirs] = useState<string[]>([]);
   const sourcePathRef = useRef<string>("");
+  const [ensurepath, setEnsurePath] = useState("");
   const [targetPath, setTargetPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +31,7 @@ function App() {
   function renderRow(props: ListChildComponentProps) {
     const { index, style } = props;
     let value = dirs[index];
-    let rel_path = relpath(value, sourcePathRef.current);
+    let rel_path = relpath(value, ensurepath);
     return (
       <ListItem
         style={style}
@@ -83,13 +84,16 @@ function App() {
         <Button
           variant="outlined"
           style={{ marginBottom: 10 }}
-          onClick={async () => {
+          onClick={() => {
             setIsLoading(true);
-            let dirs = await readMdInDirs(sourcePathRef.current);
-            setDirs(dirs);
-            setIsLoading(false);
+            setEnsurePath(sourcePathRef.current);
+            readMdInDirs(sourcePathRef.current).then((dirs) => {
+              setDirs(dirs);
+              setIsLoading(false);
+            });
           }}
         >
+          {/* 问题么有解决，区别是按按钮前后input是隔离开的需要 */}
           读取文件列表
         </Button>
         {isLoading ? (
@@ -122,7 +126,7 @@ function App() {
           onClick={() => {
             for (let index = 0; index < dirs.length; index++) {
               const element = dirs[index];
-              transform(sourcePathRef.current, element, targetPath);
+              transform(ensurepath, element, targetPath);
             }
           }}
         >
