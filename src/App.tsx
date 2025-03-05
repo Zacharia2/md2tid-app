@@ -1,56 +1,98 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 import "./App.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import { DeleteOutline } from "@mui/icons-material";
+import { md2tid, readDirs, write, remove } from "./until";
 
-import Button from "@mui/material/Button";
-import { test } from "./test";
-test();
+import {
+  Button,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  TextField,
+} from "@mui/material";
+import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  // let dir = "C:/Users/Snowy/Documents/GitHub/md2tid/src";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  const [dirs, setDirs] = useState<string[]>([]);
+  const [pathValue, setPathValue] = useState("");
+
+  // remove(testwfile);
+  function renderRow(props: ListChildComponentProps) {
+    const { index, style } = props;
+    return (
+      <ListItem
+        style={style}
+        component="div"
+        key={dirs[index]}
+        disableGutters
+        secondaryAction={
+          <ListItemButton
+            aria-label="deleteItem"
+            onClick={() =>
+              setDirs((currentDirs) =>
+                currentDirs.filter((dir) => dir !== dirs[index])
+              )
+            }
+          >
+            <DeleteOutline />
+          </ListItemButton>
+        }
+      >
+        <ListItemText primary={`Item ${dirs[index]}`} />
+      </ListItem>
+    );
   }
-
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
+      <TextField
+        id="outlined-basic"
+        label="路径"
+        variant="outlined"
+        size="small"
+        style={{ marginBottom: 10 }}
+        value={pathValue}
+        onChange={(e) => {
+          setPathValue(e.target.value);
+        }}
+      />
+      <Button
+        variant="outlined"
+        style={{ marginBottom: 10 }}
+        onClick={async () => {
+          let dirs = await readDirs(pathValue);
+          setDirs(dirs);
         }}
       >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-      <Button variant="contained">Hello world</Button>
+        读取
+      </Button>
+      <List
+        height={350}
+        width={"100%"}
+        itemSize={30}
+        itemCount={dirs.length}
+        overscanCount={5}
+        style={{ maxHeight: 400 }}
+      >
+        {renderRow}
+      </List>
+      <Button
+        variant="outlined"
+        onClick={() => {
+          for (let index = 0; index < dirs.length; index++) {
+            const element = dirs[index];
+            let tidText = md2tid(element);
+            write("C:/Users/Snowy/Documents/GitHub", tidText);
+          }
+        }}
+      >
+        转换
+      </Button>
     </main>
   );
 }

@@ -1,25 +1,11 @@
-import { md2tid } from "md-to-tid";
-
-import { readFile, writeFile, readDir, remove } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
+import { readDir, readFile, remove, writeFile } from "@tauri-apps/plugin-fs";
 
-export async function test() {
-  // 检查 `$APPDATA/avatar.png` 文件是否存在
-  // 不允许绝对路径或父目录组件
-  // 访问任意的文件系统路径，你必须在核心层上编写这样的逻辑。
-  const testfile =
-    "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/360 评估.md";
-  const testwfile =
-    "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/tidresult.md";
-  // console.log(tidText);
-  let dir = "C:/Users/Snowy/Documents/GitHub/md2tid/src";
+export const testfile =
+  "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/360 评估.md";
+export const tidresult =
+  "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/tidresult.md";
 
-  console.log(await readDirs(dir));
-
-  const tidText = await md2tid(await read(testfile));
-  remove(testwfile);
-  write(testwfile, tidText);
-}
 async function readDirs(dir: string): Promise<string[]> {
   const entries = await readDir(dir);
   let processingQueue = entries.map((entry) => ({
@@ -48,10 +34,16 @@ async function readDirs(dir: string): Promise<string[]> {
   return filePaths;
 }
 
-async function write(path: string, data: string) {
-  await writeFile(path, new TextEncoder().encode(data));
+async function write(path: string, data: Promise<string>) {
+  await writeFile(path, new TextEncoder().encode(await data));
 }
 
 async function read(path: string) {
   return new TextDecoder("utf-8").decode(await readFile(path));
 }
+
+async function md2tid(mdpath: string) {
+  return await read(mdpath);
+}
+
+export { remove, readDirs, write, read, md2tid };
