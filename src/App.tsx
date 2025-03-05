@@ -5,7 +5,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { DeleteOutline } from "@mui/icons-material";
-import { readDirs, transform_and_write } from "./until";
+import { readMdInDirs, transform } from "./until";
 
 import {
   Button,
@@ -26,18 +26,22 @@ function App() {
   // remove(testwfile);
   function renderRow(props: ListChildComponentProps) {
     const { index, style } = props;
+    let value = dirs[index];
+    let a = sourcePath.replace(/\\/g, "/");
+    let b = value.replace(/\\/g, "/");
+    let rel_path = b.split(a)[1];
     return (
       <ListItem
         style={style}
         component="div"
-        key={dirs[index]}
+        key={value}
         disableGutters
         secondaryAction={
           <ListItemButton
             aria-label="deleteItem"
             onClick={() =>
               setDirs((currentDirs) =>
-                currentDirs.filter((dir) => dir !== dirs[index])
+                currentDirs.filter((dir) => dir !== value)
               )
             }
           >
@@ -45,7 +49,7 @@ function App() {
           </ListItemButton>
         }
       >
-        <ListItemText primary={`Item ${dirs[index]}`} />
+        <ListItemText primary={`VaultFile: ${rel_path}`} />
       </ListItem>
     );
   }
@@ -77,7 +81,7 @@ function App() {
         variant="outlined"
         style={{ marginBottom: 10 }}
         onClick={async () => {
-          let dirs = await readDirs(sourcePath);
+          let dirs = await readMdInDirs(sourcePath);
           setDirs(dirs);
         }}
       >
@@ -98,7 +102,7 @@ function App() {
         onClick={() => {
           for (let index = 0; index < dirs.length; index++) {
             const element = dirs[index];
-            transform_and_write(element, targetPath);
+            transform(element, targetPath);
           }
         }}
       >

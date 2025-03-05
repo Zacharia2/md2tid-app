@@ -8,7 +8,7 @@ export const testfile =
 export const tidresult =
   "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/tidresult.md";
 
-async function readDirs(dir: string): Promise<string[]> {
+async function readMdInDirs(dir: string): Promise<string[]> {
   const entries = await readDir(dir);
   let processingQueue = entries.map((entry) => ({
     basePath: dir,
@@ -22,7 +22,11 @@ async function readDirs(dir: string): Promise<string[]> {
     let basePath = queueItem["basePath"];
     let entries = queueItem["entry"];
     if (!entries.isDirectory) {
-      filePaths.push(await join(basePath, entries.name));
+      let file = await join(basePath, entries.name);
+      let basename = await path.basename(file);
+      let suffix = basename.split(".").slice(-1)[0];
+      if (suffix != "md") continue;
+      filePaths.push(file);
     } else {
       const currentDirPath = await join(basePath, entries.name);
       const subEntries = await readDir(currentDirPath);
@@ -44,12 +48,12 @@ async function read(path: string) {
   return new TextDecoder("utf-8").decode(await readFile(path));
 }
 
-async function transform_and_write(sourcefile: string, savefile: string) {
-  savefile = await path.join(savefile, await path.basename(sourcefile));
-  // console.log(savefile);
-  let md = await read(sourcefile);
-  let tid = await md2tid(md);
+async function transform(sourcefile: string, savefolder: string) {
+  let basename = await path.basename(sourcefile);
+  let tidname = basename.split(".")[0] + ".tid";
+  let savefile = await path.join(savefolder, tidname);
+  let tid = await md2tid(await read(sourcefile));
   await write(savefile, tid);
 }
 
-export { remove, readDirs, transform_and_write };
+export { remove, readMdInDirs, transform };
