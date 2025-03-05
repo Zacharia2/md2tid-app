@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -22,7 +22,7 @@ function App() {
   // let dir = "C:/Users/Snowy/Documents/GitHub/md2tid/src";
 
   const [dirs, setDirs] = useState<string[]>([]);
-  const [sourcePath, setSourcePath] = useState("");
+  const sourcePathRef = useRef<string>("");
   const [targetPath, setTargetPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +30,7 @@ function App() {
   function renderRow(props: ListChildComponentProps) {
     const { index, style } = props;
     let value = dirs[index];
-    let rel_path = relpath(value, sourcePath);
+    let rel_path = relpath(value, sourcePathRef.current);
     return (
       <ListItem
         style={style}
@@ -50,7 +50,7 @@ function App() {
           </ListItemButton>
         }
       >
-        <ListItemText primary={`VaultFile: ${rel_path}`} />
+        <ListItemText primary={`VFile: ${rel_path}`} />
       </ListItem>
     );
   }
@@ -65,9 +65,8 @@ function App() {
           variant="outlined"
           size="small"
           style={{ marginBottom: 10 }}
-          value={sourcePath}
           onChange={(e) => {
-            setSourcePath(e.target.value);
+            sourcePathRef.current = e.target.value;
           }}
         />
         <TextField
@@ -86,7 +85,7 @@ function App() {
           style={{ marginBottom: 10 }}
           onClick={async () => {
             setIsLoading(true);
-            let dirs = await readMdInDirs(sourcePath);
+            let dirs = await readMdInDirs(sourcePathRef.current);
             setDirs(dirs);
             setIsLoading(false);
           }}
@@ -123,7 +122,7 @@ function App() {
           onClick={() => {
             for (let index = 0; index < dirs.length; index++) {
               const element = dirs[index];
-              transform(sourcePath, element, targetPath);
+              transform(sourcePathRef.current, element, targetPath);
             }
           }}
         >

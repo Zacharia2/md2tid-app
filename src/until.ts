@@ -92,7 +92,7 @@ async function transform(
   // TODO: 自定义条目名
   let field_caption = `caption: ${title}\n`;
   let field_title = `title: ${title}\n`;
-  let filed_vpath = `vpath: ${vpath}\n`;
+  let filed_vpath = `vpath: ${(vpath = vpath != "" ? vpath : "/")}\n`;
   let field_type = "type: text/vnd.tiddlywiki\n";
   tid = field_caption + field_title + filed_vpath + field_type + "\n" + tid;
   await write(savefile, tid);
