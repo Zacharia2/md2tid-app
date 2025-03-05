@@ -5,7 +5,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { DeleteOutline } from "@mui/icons-material";
-import { readMdInDirs, transform } from "./until";
+import { readMdInDirs, relpath, transform } from "./until";
 
 import {
   Box,
@@ -30,9 +30,7 @@ function App() {
   function renderRow(props: ListChildComponentProps) {
     const { index, style } = props;
     let value = dirs[index];
-    let a = sourcePath.replace(/\\/g, "/");
-    let b = value.replace(/\\/g, "/");
-    let rel_path = b.split(a)[1];
+    let rel_path = relpath(value, sourcePath);
     return (
       <ListItem
         style={style}
@@ -93,7 +91,7 @@ function App() {
             setIsLoading(false);
           }}
         >
-          读取
+          读取文件列表
         </Button>
         {isLoading ? (
           <Box
@@ -125,11 +123,11 @@ function App() {
           onClick={() => {
             for (let index = 0; index < dirs.length; index++) {
               const element = dirs[index];
-              transform(element, targetPath);
+              transform(sourcePath, element, targetPath);
             }
           }}
         >
-          转换
+          开始转换文件
         </Button>
       </main>{" "}
     </>
