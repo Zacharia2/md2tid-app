@@ -42,13 +42,6 @@ function App() {
   const [multilineOut, setMultilineOut] = useState("");
   const multilineRef = useRef("");
 
-  interface TabPanelProps {
-    children?: React.ReactNode;
-    dir?: string;
-    index: number;
-    value: number;
-  }
-
   // 变量、引用、状态
   // remove(testwfile);
   function renderRow(props: ListChildComponentProps) {
@@ -76,26 +69,6 @@ function App() {
       >
         <ListItemText primary={`VFile: ${rel_path}`} />
       </ListItem>
-    );
-  }
-
-  function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
     );
   }
 
@@ -258,9 +231,36 @@ function App() {
         </Box>
       </TabPanel>
       <TabPanel value={tabvalue} index={2} dir={theme.direction}>
-        Item Three
+        项目地址: <a>https://github.com/Zacharia2/md2tid</a>
       </TabPanel>
     </>
+  );
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  dir?: string;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
   );
 }
 
