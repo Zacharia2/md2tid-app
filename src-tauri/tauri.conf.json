@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "md2tid",
+  "productName": "md2tid-app",
   "version": "0.0.2",
   "identifier": "tingshu",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "md2tid",
+        "title": "md2tid-app",
         "width": 800,
         "height": 600
       }
@@ -23,7 +23,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "app"],
+    "targets": ["app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

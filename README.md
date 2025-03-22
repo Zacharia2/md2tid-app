@@ -53,6 +53,8 @@ registry = "git://crates.rustcc.cn/crates.io-index"
 
 ### Pnpm tauri build
 
+调试就使用 pnpm tauri dev
+
 构建过程中会遇到网络下载的问题，可以使用下面的方法解决，主要下载三个文件，把这些文件放到对的位置，这样程序校验通过后就会正常进行编译过程。
 
 - https://github.com/tauri-apps/nsis-tauri-utils/releases/download/nsis_tauri_utils-v0.4.2/nsis_tauri_utils.dll

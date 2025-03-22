@@ -7,6 +7,7 @@ import "@fontsource/roboto/700.css";
 import { DeleteOutline } from "@mui/icons-material";
 import { readMdInDirs, relpath, transform } from "./until";
 import { md2tid } from "md-to-tid";
+import {version} from "../src-tauri/tauri.conf.json"
 
 import {
   Box,
@@ -279,6 +280,8 @@ function 批量转换(props: {
 function 设置(props: { tabvalue: number; theme: Theme }) {
   return (
     <TabPanel value={props.tabvalue} index={2} dir={props.theme.direction}>
+      当前版本：{version}
+      <br></br>
       项目地址: <a>https://github.com/Zacharia2/md2tid</a>
     </TabPanel>
   );
