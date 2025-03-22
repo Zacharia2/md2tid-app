@@ -74,7 +74,7 @@ const 实时转换 = () => {
         }}
       />
       <br></br>
-      <TextArea placeholder="MarkDowm..." rows={12} value={multilineOut} />
+      <TextArea placeholder="MarkDown..." rows={12} value={multilineOut} />
     </Card>
   );
 };
