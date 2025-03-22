@@ -1,7 +1,7 @@
 {
   "name": "md2tid-app",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@blueprintjs/core": "^5.17.6",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
