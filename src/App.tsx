@@ -65,7 +65,7 @@ const 实时转换 = () => {
   return (
     <Card className="container">
       <TextArea
-        placeholder="TiddlyWiki..."
+        placeholder="MarkDown..."
         rows={10}
         value={multilineIn}
         onChange={(event) => {
@@ -74,7 +74,7 @@ const 实时转换 = () => {
         }}
       />
       <br></br>
-      <TextArea placeholder="MarkDown..." rows={12} value={multilineOut} />
+      <TextArea placeholder="TiddlyWiki..." rows={12} value={multilineOut} />
     </Card>
   );
 };
