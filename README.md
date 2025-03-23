@@ -1,8 +1,8 @@
-# MD2TID
+# MD2TID-APP
 
 Any Markdown To TiddlyWiki
 
-## issues && 遇到的问题
+## issues 遇到的问题
 
 如遇到问题请报告在这里：https://github.com/tiddly-gittly/md-to-tid/issues/11
 
