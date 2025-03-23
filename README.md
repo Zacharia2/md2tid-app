@@ -2,6 +2,10 @@
 
 Any Markdown To TiddlyWiki
 
+## issues && 遇到的问题
+
+如遇到问题请报告在这里：https://github.com/tiddly-gittly/md-to-tid/issues/11
+
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
