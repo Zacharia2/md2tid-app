@@ -81,16 +81,31 @@ const 实时转换 = () => {
 
 const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
   const [ensurepath, setEnsurePath] = useState("");
+  const [absRootPath, setAbsRootPath] = useState("");
   const [targetPath, setTargetPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dirs, setDirs] = useState<string[]>([]);
 
-  // 变量、引用、状态
-  // remove(testwfile);
+  // 组件状态，就是更新状态就会被动触发渲染。相当于函数变量。组件内主要使用它。
+  // 副作用，就是在组件执行完return后执行的函数。类似异步
+  // 函数变量只有在函数执行期间有效。
+  // ref就是临时的组件变量。只是更改不触发渲染。
+  // useMemo，记忆函数计算结果并返回数值
+  // useCallback，记忆函数并返回函数
+  // 组件和组件的函数定义是不一样的，组件就像实例，创建后就会一直到消失。
+  // 函数定义就只有执行的一刻，然后消失，用于重新计算组件，组件比函数时间长。
   function renderRow(props: ListChildComponentProps) {
     const { index, style } = props;
     let value = dirs[index];
-    let rel_path = relpath(value, ensurepath);
+    // 关键在于确保列表内容在按钮点击时被固定下来，而不是持续依赖输入框的状态
+    // 创建一个新状态保存执行后的结果，就可以和另一个状态分离，因为新状态是需要事件触发才会被更新。
+    // - 状态分离 ：输入框的状态和列表的状态是分离的，列表数据只在按钮点击时更新，不受输入框后续修改的影响。
+    // - 固定数据 ：按钮点击时，将输入框的当前值处理后存储在 listData 中，确保列表数据不会随着输入框的变化而变化。
+    // 所以简而言之，就把结果存入状态就解决啦！
+    let rel_path = relpath(value, absRootPath);
+    function handleDeleteItem() {
+      setDirs((currentDirs) => currentDirs.filter((dir) => dir !== value));
+    }
     return (
       <ListItem
         style={style}
@@ -98,14 +113,7 @@ const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
         key={value}
         disableGutters
         secondaryAction={
-          <ListItemButton
-            aria-label="deleteItem"
-            onClick={() =>
-              setDirs((currentDirs) =>
-                currentDirs.filter((dir) => dir !== value)
-              )
-            }
-          >
+          <ListItemButton aria-label="deleteItem" onClick={handleDeleteItem}>
             <DeleteOutline />
           </ListItemButton>
         }
@@ -167,6 +175,7 @@ const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
       return;
     }
     setIsLoading(true);
+    setAbsRootPath(ensurepath);
     readMdInDirs(ensurepath).then((dirs) => {
       setDirs(dirs);
       setIsLoading(false);
