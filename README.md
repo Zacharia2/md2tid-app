@@ -6,6 +6,8 @@ Any Markdown To TiddlyWiki
 
 ![Image](https://github.com/user-attachments/assets/efce43ed-6740-4286-bfea-5d7df3992bea)
 
+![Image](https://github.com/user-attachments/assets/94e9087e-405d-4d66-9737-438a05196627)
+
 自动忽略".git", ".obsidian"文件夹。
 
 ## issues 遇到的问题
