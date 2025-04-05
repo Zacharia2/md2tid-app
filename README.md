@@ -2,6 +2,10 @@
 
 Any Markdown To TiddlyWiki
 
+![Image](https://github.com/user-attachments/assets/e32be589-023a-4c1e-a7d9-9bcb4e5e703c)
+
+![Image](https://github.com/user-attachments/assets/efce43ed-6740-4286-bfea-5d7df3992bea)
+
 ## issues 遇到的问题
 
 如遇到问题请报告在这里：https://github.com/tiddly-gittly/md-to-tid/issues/11
@@ -38,26 +42,16 @@ registry = "https://github.com/rust-lang/crates.io-index"
 # 替换成你偏好的镜像源
 replace-with = 'ustc'
 
-# 清华大学
-[source.tuna]
-registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
-
 # 中国科学技术大学
 [source.ustc]
 registry = "git://mirrors.ustc.edu.cn/crates.io-index"
-
-# 上海交通大学
-[source.sjtu]
-registry = "https://mirrors.sjtug.sjtu.edu.cn/git/crates.io-index"
-
-# rustcc社区
-[source.rustcc]
-registry = "git://crates.rustcc.cn/crates.io-index"
 ```
 
 ### Pnpm tauri build
 
-调试就使用 pnpm tauri dev
+前后端调试运行 pnpm tauri dev
+
+仅前端react调试运行 pnpm dev
 
 构建过程中会遇到网络下载的问题，可以使用下面的方法解决，主要下载三个文件，把这些文件放到对的位置，这样程序校验通过后就会正常进行编译过程。
 
