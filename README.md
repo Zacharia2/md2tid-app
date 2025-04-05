@@ -6,6 +6,8 @@ Any Markdown To TiddlyWiki
 
 ![Image](https://github.com/user-attachments/assets/efce43ed-6740-4286-bfea-5d7df3992bea)
 
+自动忽略".git", ".obsidian"文件夹。
+
 ## issues 遇到的问题
 
 如遇到问题请报告在这里：https://github.com/tiddly-gittly/md-to-tid/issues/11
@@ -51,7 +53,7 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 
 前后端调试运行 pnpm tauri dev
 
-仅前端react调试运行 pnpm dev
+仅前端 react 调试运行 pnpm dev
 
 构建过程中会遇到网络下载的问题，可以使用下面的方法解决，主要下载三个文件，把这些文件放到对的位置，这样程序校验通过后就会正常进行编译过程。
 
