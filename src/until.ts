@@ -3,18 +3,20 @@ import { join } from "@tauri-apps/api/path";
 import { readDir, readFile, remove, writeFile } from "@tauri-apps/plugin-fs";
 import { md2tid } from "md-to-tid";
 
-export const testfile =
-  "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/360 评估.md";
-export const tidresult =
-  "C:/Users/Snowy/Documents/GitHub/md2tid/public/doc/tidresult.md";
-
-async function readMdInDirs(dir: string): Promise<string[]> {
+async function readMdInDirs(dir: string, customfilter: string[], fileFilter: string): Promise<string[]> {
+  let ignoreDir = [".git", ".obsidian"];
   const entries = await readDir(dir);
+  const Reg = RegExp(fileFilter);
   let processingQueue = entries.map((entry) => ({
     basePath: dir,
     entry: entry,
   }));
   let filePaths: string[] = [];
+  if (customfilter) {
+    for (const folder of customfilter) {
+      ignoreDir.push(folder)
+    }
+  }
   // 语言表示的是相对位置，上下，左右，父子，当前和下层
   while (processingQueue.length > 0) {
     const queueItem = processingQueue.pop();
@@ -25,9 +27,10 @@ async function readMdInDirs(dir: string): Promise<string[]> {
       let file = await join(basePath, entries.name);
       let basename = await path.basename(file);
       let suffix = basename.split(".").slice(-1)[0];
-      if (suffix != "md") continue;
+      // 非md文件或者非匹配文件跳过
+      if (suffix != "md" || !Reg.test(await read(file))) continue;
       filePaths.push(file);
-    } else {
+    } else if (!ignoreDir.includes(entries.name)) {
       const currentDirPath = await join(basePath, entries.name);
       const subEntries = await readDir(currentDirPath);
       let subEntryQueue = subEntries.map((entry) => ({
@@ -79,23 +82,23 @@ function basepath(path: string) {
 
 async function transform(
   sourcePath: string,
-  sourcefile: string,
-  savefolder: string
+  sourceFile: string,
+  saveFolder: string
 ) {
-  let basename = await path.basename(sourcefile);
-  let title = basename.split(".")[0];
-  let tidname = basename.split(".")[0] + ".tid";
-  let vpath = relpath(basepath(sourcefile), sourcePath);
-  tidname = makeNameSafe("$" + (await path.join(vpath, tidname)));
-  let savefile = await path.join(savefolder, tidname);
-  let tid = await md2tid(await read(sourcefile));
+  let basename = await path.basename(sourceFile);
+  let tidTitle = basename.split(".")[0];
+  let tidFileName = basename.split(".")[0] + ".tid";
+  let MDFullPath = relpath(basepath(sourceFile), sourcePath);
+  tidFileName = makeNameSafe("$" + (await path.join(MDFullPath, tidFileName)));
+  let saveFile = await path.join(saveFolder, tidFileName);
+  let tid = md2tid(await read(sourceFile));
   // TODO: 自定义条目名
-  let field_caption = `caption: ${title}\n`;
-  let field_title = `title: ${title}\n`;
-  let filed_vpath = `vpath: ${(vpath = vpath != "" ? vpath : "/")}\n`;
-  let field_type = "type: text/vnd.tiddlywiki\n";
-  tid = field_caption + field_title + filed_vpath + field_type + "\n" + tid;
-  await write(savefile, tid);
+  let tidFieldCaption = `caption: ${tidTitle}\n`;
+  let tidFieldTitle = `title: ${tidTitle}\n`;
+  let tidFiledMDFullPath = `MDFullPath: ${(MDFullPath = MDFullPath != "" ? MDFullPath : "/")}\n`;
+  let tidFieldType = "type: text/vnd.tiddlywiki\n";
+  tid = tidFieldCaption + tidFieldTitle + tidFiledMDFullPath + tidFieldType + "\n" + tid;
+  await write(saveFile, tid);
 }
 
 export { remove, readMdInDirs, transform, relpath, seq };

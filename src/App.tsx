@@ -12,20 +12,29 @@ import {
   Tabs,
   Tab,
   TextArea,
+  ButtonGroup,
 } from "@blueprintjs/core";
 import {
   CircularProgress,
   ListItem,
   ListItemButton,
   ListItemText,
+  Paper,
   Snackbar,
   SnackbarCloseReason,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 
 function App() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [fliter, setFliter] = useState({ filefilter: "", folderFilter: [""] });
 
   return (
     <Card style={{ minHeight: 600 }} elevation={Elevation.TWO}>
@@ -50,9 +59,15 @@ function App() {
         <Tab
           id="2"
           title="批量转换"
-          panel={<批量转换 setOpen={setOpen} setMessage={setMessage} />}
+          panel={
+            <批量转换
+              setOpen={setOpen}
+              setMessage={setMessage}
+              fliter={fliter}
+            />
+          }
         />
-        <Tab id="3" title="设置" panel={<设置 />} />
+        <Tab id="3" title="设置" panel={<设置 setFliter={setFliter} />} />
       </Tabs>
     </Card>
   );
@@ -79,7 +94,11 @@ const 实时转换 = () => {
   );
 };
 
-const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
+const 批量转换 = (props: {
+  setOpen: Function;
+  setMessage: Function;
+  fliter: { filefilter: string; folderFilter: string[] };
+}) => {
   const [ensurepath, setEnsurePath] = useState("");
   const [absRootPath, setAbsRootPath] = useState("");
   const [targetPath, setTargetPath] = useState("");
@@ -176,7 +195,11 @@ const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
     }
     setIsLoading(true);
     setAbsRootPath(ensurepath);
-    readMdInDirs(ensurepath).then((dirs) => {
+    readMdInDirs(
+      ensurepath,
+      props.fliter.folderFilter,
+      props.fliter.filefilter
+    ).then((dirs) => {
       setDirs(dirs);
       setIsLoading(false);
     });
@@ -212,12 +235,60 @@ const 批量转换 = (props: { setOpen: Function; setMessage: Function }) => {
   );
 };
 
-const 设置 = () => (
-  <Card>
-    当前版本：{version}
-    <br></br>
-    项目地址: <a>https://github.com/Zacharia2/md2tid</a>
-  </Card>
-);
+const 设置 = (props: { setFliter: Function }) => {
+  let [fileFilter, setFileFilter] = useState("");
+  let [folderFilter, setFolderFilter] = useState("");
+  const handleApplyFilter = () => {
+    let list = folderFilter.split(/[,，]/);
+    list = list.map((value) => value.trim());
+    props.setFliter({ filefilter: fileFilter, folderFilter: list });
+  };
+  return (
+    <>
+      <Card>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">选中文件（正则表达式，例如：^1[3-9]\d{9}$）</TableCell>
+                <TableCell align="left">排除文件夹（用逗号分割，例如：A，B）</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell align="center">
+                  <InputGroup
+                    placeholder="正则表达式"
+                    value={fileFilter}
+                    onChange={(e) => {
+                      setFileFilter(e.currentTarget.value);
+                    }}
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  <InputGroup
+                    placeholder="排除文件夹列表"
+                    value={folderFilter}
+                    onChange={(e) => {
+                      setFolderFilter(e.currentTarget.value);
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <ButtonGroup>
+          <Button text="应用筛选器" onClick={handleApplyFilter} />
+        </ButtonGroup>
+      </Card>
+      <Card>
+        当前版本：{version}
+        <br></br>
+        项目地址: <a>https://github.com/Zacharia2/md2tid</a>
+      </Card>
+    </>
+  );
+};
 
 export default App;
