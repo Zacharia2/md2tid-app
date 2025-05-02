@@ -1,19 +1,10 @@
-import { useState } from "react";
+import React, {useState} from "react";
 import "./App.css";
-import { DeleteOutline } from "@mui/icons-material";
-import { readMdInDirs, relpath, transform } from "./until";
-import { md2tid } from "md-to-tid";
-import { version } from "../src-tauri/tauri.conf.json";
-import {
-  Card,
-  Elevation,
-  Button,
-  InputGroup,
-  Tabs,
-  Tab,
-  TextArea,
-  ButtonGroup,
-} from "@blueprintjs/core";
+import {DeleteOutline} from "@mui/icons-material";
+import {mk, readMdInDirs, relpath, transform} from "./until";
+import {md2tid} from "md-to-tid";
+import {version} from "../src-tauri/tauri.conf.json";
+import {Button, ButtonGroup, Card, Elevation, InputGroup, Tab, Tabs, TextArea,} from "@blueprintjs/core";
 import {
   CircularProgress,
   ListItem,
@@ -29,20 +20,25 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import {FixedSizeList as List, ListChildComponentProps} from "react-window";
 
 function App() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [fliter, setFliter] = useState({ filefilter: "", folderFilter: [""] });
+  const [filter, setFilter] = useState({fileFilter: "", folderFilter: [""]});
+
+  const showSnackbar = function (message: string) {
+    setOpen(true);
+    setMessage(message);
+  };
 
   return (
-    <Card style={{ minHeight: 600 }} elevation={Elevation.TWO}>
+    <Card style={{minHeight: 600}} elevation={Elevation.TWO}>
       <Snackbar
         open={open}
         color=""
         autoHideDuration={1000}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
         onClose={(
           _event: React.SyntheticEvent | Event,
           reason?: SnackbarCloseReason
@@ -55,19 +51,13 @@ function App() {
         message={message}
       />
       <Tabs>
-        <Tab id="1" title="实时转换" panel={<实时转换 />} />{" "}
+        <Tab id="1" title="实时转换" panel={<实时转换/>}/>{" "}
         <Tab
           id="2"
           title="批量转换"
-          panel={
-            <批量转换
-              setOpen={setOpen}
-              setMessage={setMessage}
-              fliter={fliter}
-            />
-          }
+          panel={<批量转换 showSnackbar={showSnackbar} filter={filter}/>}
         />
-        <Tab id="3" title="设置" panel={<设置 setFliter={setFliter} />} />
+        <Tab id="3" title="设置" panel={<设置 setFilter={setFilter}/>}/>
       </Tabs>
     </Card>
   );
@@ -89,17 +79,16 @@ const 实时转换 = () => {
         }}
       />
       <br></br>
-      <TextArea placeholder="TiddlyWiki..." rows={12} value={multilineOut} />
+      <TextArea placeholder="WikiText..." rows={12} value={multilineOut}/>
     </Card>
   );
 };
 
 const 批量转换 = (props: {
-  setOpen: Function;
-  setMessage: Function;
-  fliter: { filefilter: string; folderFilter: string[] };
+  showSnackbar: Function;
+  filter: { fileFilter: string; folderFilter: string[] };
 }) => {
-  const [ensurepath, setEnsurePath] = useState("");
+  const [ensurePath, setEnsurePath] = useState("");
   const [absRootPath, setAbsRootPath] = useState("");
   const [targetPath, setTargetPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +103,7 @@ const 批量转换 = (props: {
   // 组件和组件的函数定义是不一样的，组件就像实例，创建后就会一直到消失。
   // 函数定义就只有执行的一刻，然后消失，用于重新计算组件，组件比函数时间长。
   function renderRow(props: ListChildComponentProps) {
-    const { index, style } = props;
+    const {index, style} = props;
     let value = dirs[index];
     // 关键在于确保列表内容在按钮点击时被固定下来，而不是持续依赖输入框的状态
     // 创建一个新状态保存执行后的结果，就可以和另一个状态分离，因为新状态是需要事件触发才会被更新。
@@ -122,42 +111,49 @@ const 批量转换 = (props: {
     // - 固定数据 ：按钮点击时，将输入框的当前值处理后存储在 listData 中，确保列表数据不会随着输入框的变化而变化。
     // 所以简而言之，就把结果存入状态就解决啦！
     let rel_path = relpath(value, absRootPath);
+
     function handleDeleteItem() {
       setDirs((currentDirs) => currentDirs.filter((dir) => dir !== value));
     }
+
     return (
       <ListItem
         style={style}
         component="div"
-        key={value}
+        key={rel_path}
         disableGutters
         secondaryAction={
           <ListItemButton aria-label="deleteItem" onClick={handleDeleteItem}>
-            <DeleteOutline />
+            <DeleteOutline/>
           </ListItemButton>
         }
       >
-        <ListItemText primary={`${rel_path}`} />
+        <ListItemText primary={`${rel_path}`}/>
       </ListItem>
     );
   }
 
   const handleProgressFiles = () => {
     if (dirs.length == 0) {
-      props.setOpen(true);
-      props.setMessage("无可处理内容");
+      props.showSnackbar("无可处理内容");
       return;
     } else if (targetPath == "") {
-      props.setOpen(true);
-      props.setMessage("目标路径为空");
+      props.showSnackbar("目标路径为空");
       return;
     }
-    props.setOpen(true);
-    props.setMessage("正在处理");
-    for (let index = 0; index < dirs.length; index++) {
-      const element = dirs[index];
-      transform(ensurepath, element, targetPath);
-    }
+    props.showSnackbar("正在处理");
+    mk(targetPath).then(() => {
+      const promises = dirs.map((element) => {
+        return transform(ensurePath, element, targetPath);
+      });
+      Promise.all(promises)
+        .then(() => {
+          props.showSnackbar("处理完成");
+        })
+        .catch((error) => {
+          props.showSnackbar(`转换操作中发生错误:${error}`);
+        });
+    });
   };
 
   const wait_progress = (
@@ -170,7 +166,7 @@ const 批量转换 = (props: {
         alignItems: "center",
       }}
     >
-      <CircularProgress />
+      <CircularProgress/>
     </Card>
   );
   const file_list = (
@@ -181,24 +177,23 @@ const 批量转换 = (props: {
         itemSize={30}
         itemCount={dirs.length}
         overscanCount={5}
-        style={{ maxHeight: 400 }}
+        style={{maxHeight: 400}}
       >
         {renderRow}
       </List>
     </Card>
   );
   const handle_trans = () => {
-    if (ensurepath == "") {
-      props.setOpen(true);
-      props.setMessage("无效路径");
+    if (ensurePath == "") {
+      props.showSnackbar("无效路径");
       return;
     }
     setIsLoading(true);
-    setAbsRootPath(ensurepath);
+    setAbsRootPath(ensurePath);
     readMdInDirs(
-      ensurepath,
-      props.fliter.folderFilter,
-      props.fliter.filefilter
+      ensurePath,
+      props.filter.folderFilter,
+      props.filter.fileFilter
     ).then((dirs) => {
       setDirs(dirs);
       setIsLoading(false);
@@ -208,7 +203,7 @@ const 批量转换 = (props: {
     <Card className="container">
       <InputGroup
         placeholder="输入文件夹"
-        value={ensurepath}
+        value={ensurePath}
         onChange={(e) => {
           setEnsurePath(e.target.value);
         }}
@@ -235,19 +230,19 @@ const 批量转换 = (props: {
   );
 };
 
-const 设置 = (props: { setFliter: Function }) => {
+const 设置 = (props: { setFilter: Function }) => {
   let [fileFilter, setFileFilter] = useState("");
   let [folderFilter, setFolderFilter] = useState("");
   const handleApplyFilter = () => {
     let list = folderFilter.split(/[,，]/);
     list = list.map((value) => value.trim());
-    props.setFliter({ filefilter: fileFilter, folderFilter: list });
+    props.setFilter({fileFilter: fileFilter, folderFilter: list});
   };
   return (
     <>
       <Card>
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell align="left">选中文件（正则表达式，例如：^1[3-9]\d{9}$）</TableCell>
@@ -279,7 +274,7 @@ const 设置 = (props: { setFliter: Function }) => {
           </Table>
         </TableContainer>
         <ButtonGroup>
-          <Button text="应用筛选器" onClick={handleApplyFilter} />
+          <Button text="应用筛选器" onClick={handleApplyFilter}/>
         </ButtonGroup>
       </Card>
       <Card>

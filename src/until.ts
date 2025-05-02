@@ -1,7 +1,13 @@
-import { path } from "@tauri-apps/api";
-import { join } from "@tauri-apps/api/path";
-import { readDir, readFile, remove, writeFile } from "@tauri-apps/plugin-fs";
-import { md2tid } from "md-to-tid";
+import {path} from "@tauri-apps/api";
+import {join} from "@tauri-apps/api/path";
+import {exists, mkdir, readDir, readFile, remove, writeFile} from "@tauri-apps/plugin-fs";
+import {md2tid} from "md-to-tid";
+
+async function mk(path: string) {
+  if (!await exists(path)) {
+    await mkdir(path);
+  }
+}
 
 async function readMdInDirs(dir: string, customfilter: string[], fileFilter: string): Promise<string[]> {
   let ignoreDir = [".git", ".obsidian"];
@@ -46,6 +52,7 @@ async function readMdInDirs(dir: string, customfilter: string[], fileFilter: str
 function makeNameSafe(name: string): string {
   return name.replace(/<|>|\:|\"|\/|\\|\||\?|\*|\^|\s/g, "_");
 }
+
 /**
  * @param apath 文件绝对路径
  * @param bpath 绝对根路径
@@ -101,4 +108,4 @@ async function transform(
   await write(saveFile, tid);
 }
 
-export { remove, readMdInDirs, transform, relpath, seq };
+export {remove, readMdInDirs, transform, relpath, seq, mk};
