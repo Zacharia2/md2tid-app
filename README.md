@@ -1,4 +1,5 @@
 # MD2TID-APP
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Zacharia2/md2tid-app/total)
 
 Any Markdown To TiddlyWiki
 
